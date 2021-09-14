@@ -42,6 +42,6 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 gcloud iam service-accounts keys create ${KEYFILE} \
     --iam-account="sa-infra-user@${PROJECT_ID}.iam.gserviceaccount.com"
 
-gcloud beta billing projects link ${PROJECT_ID} --billing-account $(gcloud alpha billing accounts list --format="value(name)")
+gcloud beta billing projects link ${PROJECT_ID} --billing-account $BILLING_ID
 
 gcloud services enable compute.googleapis.com
