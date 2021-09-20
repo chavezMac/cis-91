@@ -1,10 +1,10 @@
 
-variable "credentials_file" { 
-  default = "../secrets/cis-91.key" 
+variable "credentials_file" {
+  default = "../secrets/cis-91.key"
 }
 
 variable "project" {
-  default = "your-project-here"
+  default = "zer0-326618"
 }
 
 variable "region" {
@@ -26,9 +26,9 @@ terraform {
 
 provider "google" {
   credentials = file(var.credentials_file)
-  region  = var.region
-  zone    = var.zone 
-  project = var.project
+  region      = var.region
+  zone        = var.zone
+  project     = var.project
 }
 
 resource "google_compute_network" "vpc_network" {
@@ -53,11 +53,11 @@ resource "google_compute_instance" "vm_instance" {
 }
 
 resource "google_compute_firewall" "default-firewall" {
-  name = "default-firewall"
+  name    = "default-firewall"
   network = google_compute_network.vpc_network.name
   allow {
     protocol = "tcp"
-    ports = ["22"]
+    ports    = ["22"]
   }
   source_ranges = ["0.0.0.0/0"]
 }
