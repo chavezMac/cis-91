@@ -1,0 +1,34 @@
+---
+- hosts: all
+  name: Add cis-92 packages
+  become: yes
+  tasks:
+    - name: Install packages 
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        name:
+          - python3-pip 
+          - python3-venv
+
+    - name: Format new disks
+      become: yes
+      filesystem:
+        fstype: ext4
+        dev: /dev/disk/by-id/google-test-disk
+
+    - name: Create /data directory
+      become: yes
+      ansible.builtin.file:
+        path: /data
+        state: directory
+        mode: '0755'
+
+    - name: Mount new disks
+      become: yes
+      mount:
+        path: /data
+        src: /dev/disk/by-id/google-test-disk
+        fstype: ext4
+        state: mounted 
+
