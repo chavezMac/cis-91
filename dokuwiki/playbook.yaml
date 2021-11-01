@@ -1,0 +1,61 @@
+---
+- hosts: all
+  name: Add cis-92 packages
+  become: yes
+  tasks:
+    - name: Install packages 
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        name:
+          - python3-pip 
+          - python3-venv
+          - apache2
+          - php
+          - php-xml
+  
+    - name: Copy Backup script into /etc/cron.hourly/backup
+      ansible.builtin.copy:
+        src: ~/cis-91/dokuwiki/backup.sh
+        dest: /etc/cron.hourly/backup.sh
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Format Disk
+      become: yes
+      filesystem:
+        fstype: ext4
+        dev: /dev/disk/by-id/google-backup-disk
+
+    - name: Mount Disk
+      become: yes
+      mount:
+        path: /var/www
+        src: /dev/disk/by-id/google-backup-disk
+        fstype: ext4
+        state: mounted
+
+    - name: Make html Directory
+      become: yes
+      ansible.builtin.file:
+        path: /var/www/html
+        state: directory
+        mode: '0777'
+
+    - name: Unarchive Dokuwiki latest version
+      ansible.builtin.unarchive:
+        src: https://download.dokuwiki.org/src/dokuwiki/dokuwiki-stable.tgz
+        dest: /tmp
+        mode: '0777'
+        remote_src: yes
+
+    - name: Move Dokuwiki contents into html
+      ansible.builtin.copy:
+        src: /tmp/dokuwiki-2020-07-29/
+        dest: /var/www/html
+        owner: www-data
+        group: www-data
+        mode: '0777'
+        remote_src: yes
+
