@@ -1,0 +1,38 @@
+---
+- hosts: all
+  name: Add cis-92 packages
+  become: yes
+  tasks:
+    - name: Install packages 
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        name:
+          - python3-pip 
+          - python3-venv
+          - nodejs
+          - apache2
+
+    - name: Create system user
+      ansible.builtin.user:
+        name: nodeuser
+        system: yes
+
+    - name: Check out git repository
+      ansible.builtin.git:
+        clone: yes
+        repo: https://github.com/chavezMac/cis-91.git
+        dest: /src/cis-91
+    
+    - name: Create app.js file on vm
+      ansible.builtin.template:
+        src: ~/cis-91/hello-nodejs/app.js
+        dest: /home/nodeuser/app.js
+
+    - name: Create systemd service
+      ansible.builtin.template:
+        src: ~/cis-91/lab12/node_app.service
+        dest: /lib/systemd/system/node_app.service
+        owner: nodeuser
+        mode: '0644'
+
